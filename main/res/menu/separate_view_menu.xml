@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/single_channel"
+        android:title="SINGLE CHANNEL " />
+    <item android:id="@+id/double_channel"
+        android:title="DOUBLE CHANNEL" />
+    <item android:id="@+id/splash"
+        android:title="MAIN" />
+
+
+</menu>
