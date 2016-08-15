@@ -14,3 +14,4 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p>Issue 9:  Provide buttons to choose which channel the graph may take data from</p>
 <p>Issue 10: Change ICON</p>
 <p>Issue 11: Allow opening and closing of serial port via button, instead of automatic action, tied to issue 5</p>
+<p>Issue 12: Chart is lost of one leaves the activity</p>
