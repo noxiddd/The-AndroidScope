@@ -4,7 +4,7 @@ float val = 0;           // variable to store the value read
 
 void setup() {
   // put your setup code here, to run once:
-Serial.begin(9600);
+Serial.begin(115200);
 }
  String str="12.1";
 void loop() {
