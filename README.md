@@ -1,4 +1,4 @@
-# The-AndroidScope
+# The-AndroidScope=====> <span style="background-color: #FFFF00">UNDER CONSTRUCTION</span>
 Charts data fed through serial port(USB)  of android device in host mode via OTG or usb host port
 
 
