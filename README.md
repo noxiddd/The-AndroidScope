@@ -16,3 +16,4 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p>Issue 11: Allow opening and closing of serial port via button, instead of automatic action, tied to issue 5</p>
 <p>Issue 12: Chart is lost of one leaves the activity</p>
 <p>Issue 13: Graph and app by extension gets slow when charting for a while, especially if view port covers entire graph</p>
+<p>Issue 14: Graphs charting looks like crap</p>
