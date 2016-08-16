@@ -20,3 +20,4 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p>Issue 15: Create a settings activity, allow user to change serial protocols like baud rate, parity e.t.c.</p>
 <p>Issue 16: Allow users to change colour of graph or lines for charting</p>
 <p>Issue 17: App looks too basic, improve User Interface, add animations</p>
+<p>Issue 18: Saved images overwire previosly saved images of the same type</p>
