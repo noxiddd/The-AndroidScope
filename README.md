@@ -4,7 +4,7 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 
 
 <p>Issue 1:  AC signals have zero between every data point</p>
-<p>Issue 2:  Pause button dont work yet</p>
+<p><strike>Issue 2:  Pause and toggle buttons dont work yet</strike></p>
 <p>Issue 3:  How to get accuracy from serial port wihout reducing speed</p>
 <p>Issue 4:  App crashes when the back button is presses while in a charting activity</p>
 <p>Issue 5:  Connect button on splash screen does not work</p>
