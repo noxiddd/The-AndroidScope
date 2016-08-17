@@ -4,8 +4,6 @@ package com.example.noxid.androidgraphingui;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -25,27 +24,27 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.EventBusBuilder;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
-import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity  {
     Button toggle,pause,save;
+    SeekBar seekBar;
     LineChart lineChart;
     ArrayList<Entry> entries=new ArrayList<>();
     boolean show_data_points=false;
     float MaxYValue=40;
     float MinYValue=-40;
-    float x=0;
-    float y=0;
     LineData data;
     LineDataSet dataSet;
-    float prev_x=0;
-    float prev_y=0;
-    float start_time,now_time;
+    float start_time;
+    float first_interval_x=0;
+    float last_interval_x=0;
+    boolean start_capture=true;
+    boolean charting=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +52,26 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        seekBar=(SeekBar)findViewById(R.id.seekBar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progress;
+            public int progress_interval;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            //    progress=i;
+              //  progress_interval=(progress/seekBar.getScrollBarSize())*5;
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         lineChart=(LineChart) findViewById(R.id.chart);
 
         ////////////////////////////////////////////////
@@ -66,10 +84,6 @@ public class MainActivity extends AppCompatActivity  {
         data.setValueTextColor(Color.WHITE);
         lineChart.setBackgroundColor(Color.BLACK);
         /////////////////////////////////////////
-
-
-        //lineChart.getaxis
-
         Legend legend=lineChart.getLegend();
         legend.setTextColor(Color.WHITE);//sets the graph axis numebers to white
         legend.setForm(Legend.LegendForm.CIRCLE);
@@ -96,9 +110,13 @@ public class MainActivity extends AppCompatActivity  {
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this,"DATA POINTS",Toast.LENGTH_LONG).show();
                 if(show_data_points==true)
-                { dataSet.setDrawCircles(false);}
+                { dataSet.setDrawCircles(false);
+                  show_data_points=false;
+                 }
                 else if(show_data_points==false)
-                { dataSet.setDrawCircles(true);}
+                { dataSet.setDrawCircles(true);
+                  show_data_points=true;
+                }
 
                 dataSet.notifyDataSetChanged();
 
@@ -108,9 +126,20 @@ public class MainActivity extends AppCompatActivity  {
         });
 
         pause=(Button)findViewById(R.id.button_pause);
+        pause.setText("PAUSE GRAPH");
         pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                 if(pause.getText()=="PAUSE GRAPH")
+                 {
+                     pause.setText("START GRAPH");
+                     charting =false;//pause chart
+                 }
+                  else if(pause.getText()=="START GRAPH")
+                 {
+                     pause.setText("PAUSE GRAPH");
+                     charting=true;//start chart
+                 }
 
             }
         });
@@ -119,8 +148,9 @@ public class MainActivity extends AppCompatActivity  {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                lineChart.saveToGallery("Graph",50);
-                Toast.makeText(MainActivity.this, "Graph Saved To Gallery", Toast.LENGTH_LONG).show();
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                lineChart.saveToGallery(timeStamp+"_Graph",50);
+                Toast.makeText(MainActivity.this, timeStamp+"  Graph Saved To Gallery", Toast.LENGTH_LONG).show();
             }
         });
         //new Thread(new grapher()).start();//start the grapher thread to recieve from splash through intents
@@ -176,23 +206,48 @@ public class MainActivity extends AppCompatActivity  {
 
 
     @Subscribe
-    public void onMessage(Splash.Message event){
-        //mytextview.setText(event.getMessage());
-        updateChart(event.getX(),event.getY());
+    public void onMessage(Splash.Message event){//recieves data from spalsh and sends it to charting method
+        Log.d("progress",""+seekBar.getProgress());
+        //updateChart(event.getX(),event.getY(),1f/*seekBar.getProgress()*/);
+        //event.set_do_it(done);//for pausing graph
+        if (charting==true)
+           captureData(event.getX(),event.getY(),seekBar.getProgress()/10);
     }
 
-    void updateChart(float x,float y)
+    public void captureData(float x,float y,float interval)
     {
-        data.addEntry(new Entry(x/1000,y),0);
-        Log.i("y_incre y_val_before",""+y);
+
+        data.addEntry(new Entry(x, y), 0);
+        if(x>first_interval_x+interval && start_capture==false)
+        {
+            // start_capture=true;
+             updateChart(x,y,interval);
+
+            start_capture=true;
+        } if (start_capture==true) {
+            first_interval_x = x;
+            start_capture=false;
+           // data.clearValues();
+        }
+        Log.i("first_interval",""+first_interval_x);
+        Log.i("start_capture",""+start_capture);
+    }
+
+    void updateChart(float x,float y,float interval)
+    {
+        //data.addEntry(new Entry(x/1000,y),0);
+        Log.i("y_main y_val_before",""+y);
 
         Log.i("x_incre y_val",""+x);
 
         lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
-        lineChart.moveViewToX(x);
+        //lineChart.invalidate();
+        //lineChart.setVisibleXRangeMaximum(4);
+        lineChart.moveViewTo(x,0, YAxis.AxisDependency.LEFT);
+        //lineChart.moveViewToX(x);
         // lineChart.moveViewToY(x,y, YAxis.AxisDependency.LEFT);
-        lineChart.setVisibleXRangeMaximum(5f);
+
+        //data.clearValues();
 
 
     }
