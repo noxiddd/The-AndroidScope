@@ -31,11 +31,12 @@ import java.util.ArrayList;
  * Created by Jevaughn S. Dixon on 7/12/2016.
  */
 public class TwoChannels extends AppCompatActivity {
-    Button pause1,pause2,save1,save2;
+    Button pause1,pause2,save1,save2,toggle1,toggle2;
     LineChart lineChart,lineChart2;
     ArrayList<Entry> entries=new ArrayList<>();
     LineDataSet dataSet;
-    boolean show_data_points=false;
+    boolean show_data_points2=false;
+    boolean show_data_points1=false;
     float MaxYValue=40;
     float MinYValue=-40;
     float x=0;
@@ -43,6 +44,8 @@ public class TwoChannels extends AppCompatActivity {
     int graph1count=0;
     int graph2count=0;
     LineData data;
+    boolean charting1=true;
+    boolean charting2=true;//start stop charting on graph 2
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,6 +60,49 @@ public class TwoChannels extends AppCompatActivity {
         pause2=(Button)findViewById(R.id.button_pause2);
         save1=(Button)findViewById(R.id.button_save);
         save2=(Button)findViewById(R.id.button_save2);
+
+        toggle1=(Button)findViewById(R.id.button_toggle);//was to turn on and off points on graph-->not working
+        toggle2=(Button)findViewById(R.id.button_toggle2);//was to turn on and off points on graph-->not working
+        toggle1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(TwoChannels.this,"DATA POINTS",Toast.LENGTH_LONG).show();
+                if(show_data_points1==true)
+                { dataSet.setDrawCircles(false);
+                    show_data_points1=false;
+                }
+                else if(show_data_points1==false)
+                { dataSet.setDrawCircles(true);
+                    show_data_points1=true;
+                }
+
+                dataSet.notifyDataSetChanged();
+
+                lineChart.notifyDataSetChanged();
+                lineChart.invalidate();
+            }
+        });
+
+        toggle2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(TwoChannels.this,"DATA POINTS",Toast.LENGTH_LONG).show();
+                if(show_data_points2==true)
+                { dataSet.setDrawCircles(false);
+                    show_data_points2=false;
+                }
+                else if(show_data_points2==false)
+                { dataSet.setDrawCircles(true);
+                    show_data_points2=true;
+                }
+
+                dataSet.notifyDataSetChanged();
+
+                lineChart2.notifyDataSetChanged();
+                lineChart2.invalidate();
+            }
+        });
+
 
         save1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +181,44 @@ public class TwoChannels extends AppCompatActivity {
         lineChart.setData(data);
         lineChart2.setData(data);
 
+        pause1=(Button)findViewById(R.id.button_pause);
+        pause2=(Button)findViewById(R.id.button_pause2) ;
+        pause1.setText("PAUSE GRAPH");
+        pause2.setText("PAUSE GRAPH");
+        pause1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(pause1.getText()=="PAUSE GRAPH")
+                {
+                    pause1.setText("START GRAPH");
+                    charting1=false;
+                }
+                else if(pause1.getText()=="START GRAPH")
+                {
+                    pause1.setText("PAUSE GRAPH");
+                    charting1=true;
+                }
+
+            }
+        });
+
+        pause2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(pause2.getText()=="PAUSE GRAPH")
+                {
+                    pause2.setText("START GRAPH");
+                   charting2=false;
+                }
+                else if(pause2.getText()=="START GRAPH")
+                {
+                    pause2.setText("PAUSE GRAPH");
+                    charting2=true;
+                }
+
+            }
+        });
+
     }
 
     @Override
@@ -187,28 +271,44 @@ public class TwoChannels extends AppCompatActivity {
     @Subscribe
     public void onMessage(Splash.Message event){
         //mytextview.setText(event.getMessage());
-        updateChart(event.getX(),event.getY());
+       if (charting1==true)
+          updateChart1(event.getX(),event.getY());
+        if(charting2==true)
+            updateChart2(event.getX(),event.getY());
     }
 
-    void updateChart(float x,float y)
+    void updateChart1(float x,float y)
     {
-        data.addEntry(new Entry(x/1000,y),0);
+        data.addEntry(new Entry(x,y),0);
         Log.i("y_incre y_val_before",""+y);
 
         Log.i("x_incre y_val",""+x);
-
+        dataSet.setCubicIntensity(0.1f);
         lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
+        //lineChart.invalidate();
         lineChart.moveViewToX(x);
         // lineChart.moveViewToY(x,y, YAxis.AxisDependency.LEFT);
         lineChart.setVisibleXRangeMaximum(5f);
 
+        lineChart.moveViewTo(x,0, YAxis.AxisDependency.LEFT);
+    }
+
+    void updateChart2(float x,float y)
+    {
+        data.addEntry(new Entry(x,y),0);
+        Log.i("y_incre y_val_before",""+y);
+
+        Log.i("x_incre y_val",""+x);
+        dataSet.setCubicIntensity(0.1f);
+
         lineChart2.notifyDataSetChanged();
-        lineChart2.invalidate();
+        //lineChart2.invalidate();
         lineChart2.moveViewToX(x);
         // lineChart.moveViewToY(x,y, YAxis.AxisDependency.LEFT);
         lineChart2.setVisibleXRangeMaximum(5f);
+        lineChart2.moveViewTo(x,0, YAxis.AxisDependency.LEFT);
     }
+
 
 /*
     ArrayList<Entry> graphing()//plots the sine graph that goes into both upper and lower graphs

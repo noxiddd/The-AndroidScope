@@ -6,47 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.TwoLineListItem;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
-import com.hoho.android.usbserial.util.HexDump;
-
-import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.EventBus;//library to pass data between activities
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,26 +28,19 @@ import java.util.Set;
  */
 public class Splash extends AppCompatActivity {
 
-   // LineChart lineChart;
+
     ImageView iv;
     Button single,separated,double_,connect_arduino;
     TextView tv;
     String data_str="";
     float x=0;
     float y=0;
-    boolean do_it=false;
+    boolean do_it=false;// controls whether charting happens or not
+    boolean do_it2=true;// controls whether charting happens or not
     int count=0;
     boolean time_start=false;
     long time_started=0;
     long curent_time=0;
-    public static final int CTS_CHANGE = 1;
-    public static final int DSR_CHANGE = 2;
-    public static final int MESSAGE_FROM_SERIAL_PORT = 0;
-
-    LineDataSet dataSet;
-    ArrayList<Entry> entries=new ArrayList<>();
-    LineData data;
-
     private ConnectService connectService;
     private MyHandler mHandler;
 
@@ -124,40 +91,6 @@ public class Splash extends AppCompatActivity {
         setContentView(R.layout.splash);
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mHandler = new MyHandler(this);
-
-      /*  lineChart=(LineChart) findViewById(R.id.chart);
-        entries.add(new Entry(x,y));
-        dataSet=new LineDataSet(entries,"Channel 1");
-
-
-
-
-        data=new LineData(dataSet);//was final LineData data=new LineData(dataSet);
-        data.setValueTextColor(Color.WHITE);
-        lineChart.setBackgroundColor(Color.BLACK);
-
-        Legend legend=lineChart.getLegend();
-        legend.setTextColor(Color.WHITE);//sets the graph axis numebers to white
-        legend.setForm(Legend.LegendForm.CIRCLE);
-
-        XAxis xAxis=lineChart.getXAxis();
-        xAxis.setTextColor(Color.WHITE);//sets the graph number to white color
-        xAxis.setAvoidFirstLastClipping(true);
-
-        //xAxis.set
-
-
-        YAxis yAxis=lineChart.getAxisLeft();//set the maximum and minimum voltage for the scope at 40 and -40
-        yAxis.setTextColor(Color.WHITE);
-        yAxis.setAxisMaxValue(6);//max voltage
-        yAxis.setAxisMinValue(-6);
-
-        dataSet.setDrawCircles(false);//removes lar
-        lineChart.setVisibleXRangeMaximum(2f);
-        lineChart.setData(data);
-        dataSet.setCubicIntensity(0.7f);*/
-
-
 
         iv=(ImageView)findViewById(R.id.image);
         iv.setImageResource(R.drawable.oscioscope_pic);//set the picture of the oscilioscope
@@ -276,7 +209,6 @@ public class Splash extends AppCompatActivity {
                     y_value[1]=10;
 
                     Log.i("Data_before",data_msg);
-                    //data_msg=mActivity.get().check_string(data_msg);
                     try {
 
                         y_value = mActivity.get().fix_string(data_msg);
@@ -326,12 +258,6 @@ public class Splash extends AppCompatActivity {
 
 
         Log.i("x_incre",""+x);
-
-        /*lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
-        lineChart.moveViewToX(x);
-        // lineChart.moveViewToY(x,y, YAxis.AxisDependency.LEFT);
-        lineChart.setVisibleXRangeMaximum(5f);*/
         EventBus.getDefault().post(new Message(x/1000,y));
         do_it=false;
 
@@ -354,7 +280,7 @@ public class Splash extends AppCompatActivity {
             do_it=false;
         }
         else if(count==2)
-        {count=0;
+        {
             try {
                 data_str = data_str.concat(str);
 
@@ -367,7 +293,7 @@ public class Splash extends AppCompatActivity {
                     Log.i("fixi", "HERE");
                     Log.i("data_str2", split[i] + "++++" + y_val[0]);
                 }
-                Log.i("data_str_after-",data_str);
+                Log.i("data_str_after-++",data_str);
                 Log.i("data_str_after0", split[0] + "++++" + y_val[0]);
                 Log.i("data_str_after1", split[1] + "++++" + y_val[1]);
                 Log.i("data_str_after2", split[2] + "++++" + y_val[2]);
@@ -377,17 +303,19 @@ public class Splash extends AppCompatActivity {
             {
                 e.printStackTrace();
             }
+            count=0;
         }
-        //  if(y_val[1]==0)
+      // if(do_it2==false)
         //   do_it=false;//this is a cheat
+       // else if(do_it2==true)
+        //   do_it=true;
         return y_val;
     }
 
 
-    public class Message{
+    public class Message{//this allows data to be sent between ativies using
         private final float y;
         private final float x;
-
         public Message(float x,float y) {
             this.y=y;
             this.x=x;
@@ -400,6 +328,8 @@ public class Splash extends AppCompatActivity {
         public float getX() {
             return x;
         }
+
+
     }
 
 
