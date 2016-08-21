@@ -22,4 +22,4 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p>Issue 17: App looks too basic, improve User Interface, add animations</p>
 <p><strike>Issue 18: Saved graph images overwrite previously saved graph images of the same type</strike></p>
 <p>Issue 19: AutoSet feature does not work 100% of the time</p>
-![New Look](https://github.com/noxiddd/The-AndroidScope/blob/UI-update/new-look-2016-08-21-133544.png)
+<p><center>![New Look](https://github.com/noxiddd/The-AndroidScope/blob/UI-update/new-look-2016-08-21-133544.png)</center></p>
