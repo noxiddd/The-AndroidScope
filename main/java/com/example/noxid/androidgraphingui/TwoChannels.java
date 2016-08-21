@@ -25,24 +25,29 @@ import com.github.mikephil.charting.data.LineDataSet;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Jevaughn S. Dixon on 7/12/2016.
  */
 public class TwoChannels extends AppCompatActivity {
-    Button pause1,pause2,save1,save2;
+    Button pause1,pause2,save1,save2,toggle1,toggle2;
     LineChart lineChart,lineChart2;
     ArrayList<Entry> entries=new ArrayList<>();
     LineDataSet dataSet;
-    boolean show_data_points=false;
+    boolean show_data_points2=false;
+    boolean show_data_points1=false;
     float MaxYValue=40;
     float MinYValue=-40;
     float x=0;
     float y=0;
     int graph1count=0;
     int graph2count=0;
-    LineData data;
+    LineData data,data2;
+    boolean charting1=true;
+    boolean charting2=true;//start stop charting on graph 2
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -58,31 +63,66 @@ public class TwoChannels extends AppCompatActivity {
         save1=(Button)findViewById(R.id.button_save);
         save2=(Button)findViewById(R.id.button_save2);
 
+        toggle1=(Button)findViewById(R.id.button_toggle);//was to turn on and off points on graph-->not working
+        toggle2=(Button)findViewById(R.id.button_toggle2);//was to turn on and off points on graph-->not working
+        toggle1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(TwoChannels.this,"DATA POINTS",Toast.LENGTH_LONG).show();
+                if(show_data_points1==true)
+                { dataSet.setDrawCircles(false);
+                    show_data_points1=false;
+                }
+                else if(show_data_points1==false)
+                { dataSet.setDrawCircles(true);
+                    show_data_points1=true;
+                }
+
+                dataSet.notifyDataSetChanged();
+
+                lineChart.notifyDataSetChanged();
+                lineChart.invalidate();
+            }
+        });
+
+        toggle2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(TwoChannels.this,"DATA POINTS",Toast.LENGTH_LONG).show();
+                if(show_data_points2==true)
+                { dataSet.setDrawCircles(false);
+                    show_data_points2=false;
+                }
+                else if(show_data_points2==false)
+                { dataSet.setDrawCircles(true);
+                    show_data_points2=true;
+                }
+
+                dataSet.notifyDataSetChanged();
+
+                lineChart2.notifyDataSetChanged();
+                lineChart2.invalidate();
+            }
+        });
+
+
         save1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {//saves the upper graph to gallery
-                if(graph1count==0)
-                {lineChart.saveToGallery("UpperGraph",60);}
-                else
-                {
-                    graph1count++;
-                    lineChart.saveToGallery("UpperGraph"+graph1count,60);
-                }
-                Toast.makeText(TwoChannels.this, "Upper Graph Saved To Gallery", Toast.LENGTH_LONG).show();
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                lineChart.saveToGallery(timeStamp+"__UpperGraph",60);
+
+                Toast.makeText(TwoChannels.this, timeStamp+"  Upper Graph Saved To Gallery", Toast.LENGTH_LONG).show();
             }
         });
 
         save2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {//save the lower graph to gallery
-                if(graph2count==0)
-                {lineChart2.saveToGallery("LowerGraph",50);}
-                else
-                {
-                    graph2count++;
-                    lineChart2.saveToGallery("LowerGraph"+graph2count,50);
-                }
-                Toast.makeText(TwoChannels.this, "Lower Graph Saved To Gallery", Toast.LENGTH_LONG).show();
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+                lineChart2.saveToGallery(timeStamp+"__LowerGraph",50);
+
+                Toast.makeText(TwoChannels.this, timeStamp+"  LowerGraph Saved To Gallery", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -91,7 +131,9 @@ public class TwoChannels extends AppCompatActivity {
         dataSet=new LineDataSet(entries,"Channel 1");
 
         data=new LineData(dataSet);
+        data2=new LineData(dataSet);
         data.setValueTextColor(Color.WHITE);
+        data2.setValueTextColor(Color.WHITE);
         lineChart.setBackgroundColor(Color.BLACK);
         lineChart2.setBackgroundColor(Color.BLACK);
         /////////////////////////////////////////
@@ -133,7 +175,45 @@ public class TwoChannels extends AppCompatActivity {
 
 
         lineChart.setData(data);
-        lineChart2.setData(data);
+        lineChart2.setData(data2);
+
+        pause1=(Button)findViewById(R.id.button_pause);
+        pause2=(Button)findViewById(R.id.button_pause2) ;
+        pause1.setText("PAUSE GRAPH");
+        pause2.setText("PAUSE GRAPH");
+        pause1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(pause1.getText()=="PAUSE GRAPH")
+                {
+                    pause1.setText("START GRAPH");
+                    charting1=false;
+                }
+                else if(pause1.getText()=="START GRAPH")
+                {
+                    pause1.setText("PAUSE GRAPH");
+                    charting1=true;
+                }
+
+            }
+        });
+
+        pause2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(pause2.getText()=="PAUSE GRAPH")
+                {
+                    pause2.setText("START GRAPH");
+                   charting2=false;
+                }
+                else if(pause2.getText()=="START GRAPH")
+                {
+                    pause2.setText("PAUSE GRAPH");
+                    charting2=true;
+                }
+
+            }
+        });
 
     }
 
@@ -187,38 +267,45 @@ public class TwoChannels extends AppCompatActivity {
     @Subscribe
     public void onMessage(Splash.Message event){
         //mytextview.setText(event.getMessage());
-        updateChart(event.getX(),event.getY());
+
+       if (charting1==true)//pauses/resumes the top graph
+          updateChart1(event.getX(),event.getY());
+        if(charting2==true)//pasues/resumes the bottom graph
+            updateChart2(event.getX(),event.getY());
     }
 
-    void updateChart(float x,float y)
+    void updateChart1(float x,float y)
     {
-        data.addEntry(new Entry(x/1000,y),0);
+        data.addEntry(new Entry(x,y),0);
+
         Log.i("y_incre y_val_before",""+y);
 
         Log.i("x_incre y_val",""+x);
-
+        dataSet.setCubicIntensity(0.1f);
         lineChart.notifyDataSetChanged();
-        lineChart.invalidate();
+        //lineChart.invalidate();
         lineChart.moveViewToX(x);
         // lineChart.moveViewToY(x,y, YAxis.AxisDependency.LEFT);
         lineChart.setVisibleXRangeMaximum(5f);
 
+        lineChart.moveViewTo(x,0, YAxis.AxisDependency.LEFT);
+    }
+
+    void updateChart2(float x,float y)
+    {
+        data2.addEntry(new Entry(x,y),0);
+
+        Log.i("y_incre y_val_before",""+y);
+
+        Log.i("x_incre y_val",""+x);
+        dataSet.setCubicIntensity(0.1f);
+
         lineChart2.notifyDataSetChanged();
-        lineChart2.invalidate();
+        //lineChart2.invalidate();
         lineChart2.moveViewToX(x);
         // lineChart.moveViewToY(x,y, YAxis.AxisDependency.LEFT);
         lineChart2.setVisibleXRangeMaximum(5f);
+        lineChart2.moveViewTo(x,0, YAxis.AxisDependency.LEFT);
     }
 
-/*
-    ArrayList<Entry> graphing()//plots the sine graph that goes into both upper and lower graphs
-    {
-        while(x<500)
-        {
-            entries.add(new Entry(x,y));
-            x=x+0.1f;
-            y=(float)Math.sin(x)*20;
-        }
-        return entries;
-    }*/
 }

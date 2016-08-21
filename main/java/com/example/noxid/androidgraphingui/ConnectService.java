@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.felhr.usbserial.CDCSerialDevice;
 import com.felhr.usbserial.UsbSerialDevice;
@@ -42,7 +43,7 @@ public class ConnectService extends Service {
     public static final int CTS_CHANGE = 1;
     public static final int DSR_CHANGE = 2;
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
-    private static final int BAUD_RATE = 9600; // BaudRate. Change this value if you need
+    private static final int BAUD_RATE = 115200; // BaudRate. Change this value if you need
     public static boolean SERVICE_CONNECTED = false;
 
     private IBinder binder = new UsbBinder();
@@ -67,6 +68,7 @@ public class ConnectService extends Service {
                 String data = new String(arg0, "UTF-8");
                 if (mHandler != null)
                     mHandler.obtainMessage(MESSAGE_FROM_SERIAL_PORT, data).sendToTarget();
+                Log.d("Service_data",""+data);
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -216,11 +218,13 @@ public class ConnectService extends Service {
             serialPort.write(data);
     }
 
+
+
     public void setHandler(Handler mHandler) {
         this.mHandler = mHandler;
     }
 
-    private void findSerialPortDevice() {
+    public void findSerialPortDevice() {
         // This snippet will try to open the first encountered usb device connected, excluding usb root hubs
         HashMap<String, UsbDevice> usbDevices = usbManager.getDeviceList();
         if (!usbDevices.isEmpty()) {
@@ -254,6 +258,10 @@ public class ConnectService extends Service {
         }
     }
 
+    public boolean isSerialPortConnected()
+    {
+        return serialPortConnected;
+    }
     private void setFilter() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_USB_PERMISSION);
