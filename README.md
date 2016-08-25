@@ -24,5 +24,5 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p>Issue 19: AutoSet feature does not work 100% of the time</p>
 <p>Issue 20: Lots of data points are dropped during charting, reduces the apprent smaple rate on graph</p>
 <p>Issue 21: App slows down, crashes even, when the number of points is increased, UI thread doing too much work</p>
-<p>Issue 22: Passing data to Splash is unecessary, do intial calculations in service and pass data to charting activies</p>
+<p>Issue 22: Passing data to Splash is unecessary, do intial calculations in service and pass data to charting activies directly</p>
 <center>![New Look](https://github.com/noxiddd/The-AndroidScope/blob/UI-update/new-look-2016-08-21-133544.png)</center>
