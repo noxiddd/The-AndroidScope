@@ -25,4 +25,5 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p>Issue 20: Lots of data points are dropped during charting, reduces the apprent smaple rate on graph</p>
 <p>Issue 21: App slows down, crashes even, when the number of points is increased, UI thread doing too much work</p>
 <p>Issue 22: Passing data to Splash is unecessary, do intial calculations in service and pass data to charting activies directly</p>
+<p>Issue 23: Data on chart is not even, comes in short bursts which reduces chart accuracy</p>
 <center>![New Look](https://github.com/noxiddd/The-AndroidScope/blob/UI-update/new-look-2016-08-21-133544.png)</center>
