@@ -7,7 +7,7 @@ Charts data fed through serial port(USB)  of android device in host mode via OTG
 <p><strike>Issue 2:  Pause and toggle buttons dont work yet</strike></p>
 <p>Issue 3:  How to get accuracy from serial port wihout reducing speed</p>
 <p>Issue 4:  App crashes when the back button is presses while in a charting activity_>debatable, only observed on toshiba tablet</p>
-<p>Issue 5:  Connect/Disconnect button on splash screen does not work</p>
+<p>Issue 5:  Connect/Disconnect button on splash screen does not work_>_works after arduino is plugged out and plugged back in</p>
 <p>Issue 6:  For smartphone with smaller batteries, may not power arduino properly, will it work with alternate power source?</p>
 <p>Issue 7:  Capture data in buffer and only display one time interval</p>
 <p>Issue 8:  Label x values in units of time</p>
